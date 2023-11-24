@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'space';
-    src: url(space.ttf), format(truetype);
+    font-family: 'fishfont';
+    src: url(fishy.ttf), format(truetype);
     font-display: swap;
 }
 
 #fullscreen {
-    background-color: #770000; 
+    background-color: lightsalmon; 
     color: white; 
     border: none; 
     padding: 15px 32px; 
@@ -29,18 +29,50 @@ body {
 }
 
 .header {
-    font-family: 'space', sans-serif;
-    font-size: 3.5rem;
+    font-family: 'fishfont', sans-serif;
+    font-size: 5rem;
     margin-bottom: 1.8rem;
-    color: #770000;
-    text-shadow: -3px 3px 0px yellow;
+    color: seashell;
 }
 
 #canvas1 {
-    border: 2px solid lightsteelblue;
+    border: 1rem solid seashell;
     display: block;
     cursor: pointer;
     margin-left: auto;
     margin-right: auto;
 }
 
+.wrapper {
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+    overflow: hidden;
+  }
+  
+  .wave {
+    width: 1000px;
+    height: 1025px;
+    position: absolute;
+    top: -25%;
+    left: 50%;
+    margin-left: -500px;
+    margin-top: -500px;
+    border-radius: 35%;
+    background: rgba(255, 255, 255, .75);
+    animation: wave 15s infinite linear;
+  }
+  
+  @keyframes wave {
+    from {
+      transform: rotate(0deg);
+    }
+    from {
+      transform: rotate(360deg);
+    }
+  }
