@@ -15,6 +15,7 @@ const bgHue = "#777777";
 var pCX = Math.floor(maxW / pixS);  // count of pixels across the screen
 var pCY = Math.floor(maxH / pixS);  // count of pixels across the screen
 
+
 function resizeCanvas() {
     if (isFullscreen) {
         c.width = window.innerWidth;
@@ -47,6 +48,17 @@ var pA = new Array(pCY);
 var cloneA = new Array(pCY);
 
 
+function initialize(){
+    for (var y = 0; y < pCY ; y++){
+        temp_x = new Array(pCX);
+        for (var x = 0; x < pCX; x++){
+            temp_x[x] = Math.random();
+        }
+        pA[y] = temp_x;
+        cloneA[y] = temp_x;
+    }
+}
+
 function tick() {
     // Clear and fill background
     ctx.clearRect(minW, minH, maxW, maxH);
@@ -54,17 +66,25 @@ function tick() {
     ctx.fillRect(minW, minH, maxW, maxH);
   
     // Draw screen
-    ctx.fillStyle = elHues[pA[y_index][x_index]];
-    ctx.fillRect((x - offXP % 1) * pixS, (y - offYP % 1) * pixS, pixS, pixS);
+    ctx.fillStyle = "#666666";
+    for( var y = 0; y < pCY; y++){
+        for (var x = 0; x < pCX; x++){
+            ctx.fillStyle = "hsl(" + pA[y][x] * 360 + ", 100%, 50%)"; // Blue color
+            ctx.fillRect(x * pixS, y * pixS, pixS, pixS)
+        }
+    }
 
 
     // Write troubleshooting info
     ctx.fillStyle = "#000000";
-    ctx.fillText("X-Value of Player: " + x_coord, 10, 10);
+    ctx.fillText("X-Value of Player: " + 0, 10, 10);
 
     itC++;
 }
 
+// Initialize
+
+initialize();
 
 
 
