@@ -2,22 +2,22 @@ var c = document.getElementById("canvas1");
 var ctx = c.getContext("2d");
 var isFullscreen = false;
 
-var pCXW = 1000;      // count of pixels across the world
-var pCYW = 800;       // count of pixels across the world
+
 var itC = 0;
 const tickS = 50;
-var pixS = 10;
-var pixS_OG = pixS;
 const minW = 0;
 const minH = 0;
 var maxW = c.width;   
 var maxH = c.height;
+var pixS = Math.floor(10);
+var pixS_OG = pixS;
 
-var maxW_OG = maxW;
-var maxH_OG = maxH;
+
 const bgHue = "#777777";
 var pCX = Math.floor(maxW / pixS);  // count of pixels across the screen
 var pCY = Math.floor(maxH / pixS);  // count of pixels across the screen
+var maxW_OG = maxW;
+var maxH_OG = maxH;
 
 
 function resizeCanvas() {
