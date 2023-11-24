@@ -265,6 +265,10 @@ function tick() {
     ctx.fillText("A red background tile has no food, and the tile has a more purple-shifted hue as it has more food.", 300, 20);
     ctx.fillText("Each fish (small squares) consumes food from the backhround tile and can reproduce if it has sufficient food.", 300, 30);
     ctx.fillText("During reproduction, a small mutation is applied to allow for the fish to become better at getting all the food through generations.", 300, 40);
+    ctx.fillText("The trait 'reproduction ratio' decides what fraction of the parents food stores goes to the child", 300, 50);
+
+
+
 
     itC++;
 }
