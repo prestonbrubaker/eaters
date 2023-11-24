@@ -9,14 +9,18 @@ const minW = 0;
 const minH = 0;
 var maxW = c.width;   
 var maxH = c.height;
-var pixS = Math.floor(20);
+var pixS = Math.floor(10);
 var pixS_OG = pixS;
 
 // Creatures
 cr_x = [400, 300, 200, 100];
 cr_y = [400, 200, 304, 100];
+
+cr_v_x = [0, 0, 0, 0];
+cr_v_y = [0, 0, 0, 0];
+
 cr_food = [10, 10, 10, 10];
-cr_speed = [1, 10, 20, 30];
+cr_speed = [.1, .10, .20, .30];
 
 cr_size = 10;
 
@@ -24,8 +28,8 @@ cr_hue = [20, 100, 200, 300];
 
 
 const bgHue = "#777777";
-var pCX = Math.floor(maxW / pixS - 5);  // count of pixels across the screen
-var pCY = Math.floor(maxH / pixS - 1);  // count of pixels across the screen
+var pCX = Math.floor(maxW / pixS - 0);  // count of pixels across the screen
+var pCY = Math.floor(maxH / pixS + 1);  // count of pixels across the screen
 var maxW_OG = maxW;
 var maxH_OG = maxH;
 
@@ -89,6 +93,22 @@ function initialize(){
     }
 }
 
+function calculateMean(arr) {
+    const total = arr.reduce((sum, value) => sum + value, 0);
+    return total / arr.length;
+}
+
+function calculateStandardDeviation(arr) {
+    const mean = calculateMean(arr);
+    const squareDiffs = arr.map(value => {
+        const diff = value - mean;
+        return diff * diff;
+    });
+    const avgSquareDiff = calculateMean(squareDiffs);
+    return Math.sqrt(avgSquareDiff);
+}
+
+
 function tick() {
     // Clear and fill background
     ctx.clearRect(minW, minH, maxW, maxH);
@@ -98,9 +118,18 @@ function tick() {
     var total_food = 0
     // Draw screen
     ctx.fillStyle = "#666666";
+    var max_i_love_willoh = 0
     for( var y = 0; y < pCY; y++){
         for (var x = 0; x < pCX; x++){
-            ctx.fillStyle = "hsl(" + Math.abs(pA[y][x]) * 360 + ", 10%, 30%)"; // Blue color
+            if(pA[y][x] > max_i_love_willoh){
+                max_i_love_willoh = pA[y][x];
+            }
+        }
+    }
+
+    for( var y = 0; y < pCY; y++){
+        for (var x = 0; x < pCX; x++){
+            ctx.fillStyle = "hsl(" + Math.abs(pA[y][x]) * 360 / max_i_love_willoh + ", 10%, 30%)"; // Blue color
             ctx.fillRect(x * pixS, y * pixS, pixS, pixS);
             total_food += pA[y][x];
             pA[y][x] += Math.random() * 0.1;
@@ -114,24 +143,39 @@ function tick() {
         x = cr_x[i];
         y = cr_y[i];
         ctx.fillRect(x, y, cr_size, cr_size);
-        x += (Math.random() - 0.5) * cr_speed[i];
-        y += (Math.random() - 0.5) * cr_speed[i];
+        cr_v_x[i] += (Math.random() - 0.5) * cr_speed[i];
+        cr_v_y[i] += (Math.random() - 0.5) * cr_speed[i];
         if(x < 0){
             x = 0;
+            cr_v_x[i] *= -.1;
         }
         if(x > pCX * pixS){
             x = pCX * pixS;
+            cr_v_x[i] *= -.1;
         }
         if(y < 0){
             y = 0;
+            cr_v_y[i] *= -.1;
         }
         if(y > pCY * pixS){
             y = pCY * pixS;
+            cr_v_y[i] *= -.1;
         }
 
         index_x = Math.floor(x / pixS);
         index_y = Math.floor(y / pixS);
-
+        if(index_x < 0){
+            index_x = 0;
+        }
+        if(index_x > pCX - 1){
+            index_x = pCX - 1;
+        }
+        if(index_y < 0){
+            index_y = 0;
+        }
+        if(index_y > pCY - 1){
+            index_y = pCY - 1;
+        }
         //Add food
         if(pA[index_y][index_x] > 0){
             var food_trans = 0.5 * pA[index_y][index_x];
@@ -145,12 +189,15 @@ function tick() {
             cr_food[i] -= child_trans;
             cr_x.push(cr_x[i]);
             cr_y.push(cr_y[i]);
+            cr_v_x.push(cr_v_x[i] * 0.5);
+            cr_v_y.push(cr_v_y[i] * 0.5);
             cr_food.push(child_trans);
-            cr_hue.push(cr_hue[i]);
+            cr_hue.push(cr_hue[i] + (Math.random() - 0.5) * 10);
             cr_speed.push(cr_speed[i] * (Math.random() * 0.1 + 0.95))
         }
 
-
+        x += cr_v_x[i];
+        y += cr_v_y[i];
 
         cr_x[i] = x;
         cr_y[i] = y;
@@ -169,12 +216,36 @@ function tick() {
             cr_food.splice(i, 1);
             cr_hue.splice(i, 1);
             cr_speed.splice(i, 1);
+            cr_v_x.splice(i, 1);
+            cr_v_y.splice(i, 1);
         }
     }
 
     // Write troubleshooting info
     ctx.fillStyle = "#000000";
     ctx.fillText("Total Food: " + total_food, 10, 10);
+
+    avg_food = calculateMean(cr_food);
+    std_dev_food = calculateStandardDeviation(cr_food);
+
+
+
+    ctx.fillText("Average food of organisms: " + Math.floor(avg_food), 10, 20);
+
+    ctx.fillText("Std Dev of food of organisms: " + Math.floor(std_dev_food * 10) / 10, 10, 30);
+
+    avg_speed = calculateMean(cr_speed);
+
+    std_dev_speed = calculateStandardDeviation(cr_speed);
+
+    ctx.fillText("Average speed of organisms: " + Math.floor(avg_speed * 1000) / 1000, 10, 40);
+
+    ctx.fillText("Std Dev of speed of organisms: " + Math.floor(std_dev_speed * 1000) / 1000, 10, 50);
+
+    ctx.fillText("Program by Preston Brubaker and Willoh Robbins ", 300, 10);
+    ctx.fillText("A red background tile has no food, and the tile has a more purple-shifted hue as it has more food.", 300, 20);
+    ctx.fillText("Each fish (small squares) consumes food from the backhround tile and can reproduce if it has sufficient food.", 300, 30);
+    ctx.fillText("During reproduction, a small mutation is applied to allow for the fish to become better at getting all the food through generations.", 300, 40);
 
     itC++;
 }
