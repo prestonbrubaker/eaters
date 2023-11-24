@@ -4,12 +4,12 @@ var isFullscreen = false;
 
 
 var itC = 0;
-const tickS = 50;
+const tickS = 100;
 const minW = 0;
 const minH = 0;
 var maxW = c.width;   
 var maxH = c.height;
-var pixS = Math.floor(10);
+var pixS = Math.floor(20);
 var pixS_OG = pixS;
 
 // Creatures
@@ -156,7 +156,7 @@ function tick() {
         cr_y[i] = y;
 
         // Metabolism
-        cr_food[i] -= .01 * Math.abs(cr_speed[i]) + 0.01;
+        cr_food[i] -= .001 * Math.abs(cr_speed[i]) + .1;
         
 
     }
