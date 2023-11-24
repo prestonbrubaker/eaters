@@ -18,9 +18,11 @@ cr_y = [400, 200, 304, 100];
 
 cr_v_x = [0, 0, 0, 0];
 cr_v_y = [0, 0, 0, 0];
+cr_age = [0, 0, 0, 0];
 
 cr_food = [10, 10, 10, 10];
-cr_speed = [.1, .10, .20, .30];
+cr_speed = [3, 2, 1.5, 5];
+cr_rep_ratio = [0.5, 0.2, 0.4, 0.9];
 
 cr_size = 10;
 
@@ -139,10 +141,12 @@ function tick() {
     var current_len = cr_hue.length;
     // Draw Fish
     for( var i = 0; i < current_len; i++){
-        ctx.fillStyle = "hsl(" + cr_hue[i] + ", 50%, 50%)"; // Blue color
         x = cr_x[i];
         y = cr_y[i];
-        ctx.fillRect(x, y, cr_size, cr_size);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(x - 0.5 * cr_size * 1.2, y - 0.5 * cr_size * 1.2, cr_size * 1.2, cr_size * 1.2);
+        ctx.fillStyle = "hsl(" + cr_hue[i] + ", 50%, 50%)";
+        ctx.fillRect(x - 0.5 * cr_size, y - 0.5 * cr_size, cr_size, cr_size);
         cr_v_x[i] += (Math.random() - 0.5) * cr_speed[i];
         cr_v_y[i] += (Math.random() - 0.5) * cr_speed[i];
         if(x < 0){
@@ -178,14 +182,14 @@ function tick() {
         }
         //Add food
         if(pA[index_y][index_x] > 0){
-            var food_trans = 0.5 * pA[index_y][index_x];
+            var food_trans = 0.25 * pA[index_y][index_x];
             pA[index_y][index_x] -= food_trans;
             cr_food[i] += food_trans;
         }
 
         //Have child if possible
         if(cr_food[i] > 20){
-            var child_trans = 10;
+            var child_trans = cr_food[i] * cr_rep_ratio[i];
             cr_food[i] -= child_trans;
             cr_x.push(cr_x[i]);
             cr_y.push(cr_y[i]);
@@ -193,7 +197,9 @@ function tick() {
             cr_v_y.push(cr_v_y[i] * 0.5);
             cr_food.push(child_trans);
             cr_hue.push(cr_hue[i] + (Math.random() - 0.5) * 10);
-            cr_speed.push(cr_speed[i] * (Math.random() * 0.1 + 0.95))
+            cr_speed.push(cr_speed[i] * (Math.random() * 0.1 + 0.95));
+            cr_age.push(0);
+            cr_rep_ratio.push(cr_rep_ratio[i] + (Math.random() - 0.5) * 0.01)
         }
 
         x += cr_v_x[i];
@@ -203,14 +209,15 @@ function tick() {
         cr_y[i] = y;
 
         // Metabolism
-        cr_food[i] -= .001 * Math.abs(cr_speed[i]) + .1;
+        cr_food[i] -= .01 * Math.abs(cr_speed[i]) ** 2 + .1;
+        cr_age[i] += 1;
         
 
     }
 
-    // Kill those without food
+    // Kill those without food or too old
     for(var i = current_len - 1; i >= 0; i--){
-        if(cr_food[i] <= 0){
+        if(cr_food[i] <= 0 || cr_age[i] > 200 + 200 * Math.random()){
             cr_x.splice(i, 1);
             cr_y.splice(i, 1);
             cr_food.splice(i, 1);
@@ -218,6 +225,8 @@ function tick() {
             cr_speed.splice(i, 1);
             cr_v_x.splice(i, 1);
             cr_v_y.splice(i, 1);
+            cr_age.splice(i, 1);
+            cr_rep_ratio.splice(i, 1);
         }
     }
 
@@ -241,6 +250,16 @@ function tick() {
     ctx.fillText("Average speed of organisms: " + Math.floor(avg_speed * 1000) / 1000, 10, 40);
 
     ctx.fillText("Std Dev of speed of organisms: " + Math.floor(std_dev_speed * 1000) / 1000, 10, 50);
+
+    avg_reprat = calculateMean(cr_rep_ratio);
+
+    std_dev_reprat = calculateStandardDeviation(cr_rep_ratio);
+
+    ctx.fillText("Average reproduction ratio of organisms: " + Math.floor(avg_reprat * 10000) / 10000, 10, 60);
+
+    ctx.fillText("Std Dev of reproduction ratio of organisms: " + Math.floor(std_dev_reprat * 10000) / 10000, 10, 70);
+
+    ctx.fillText("Number of organisms: " + cr_hue.length, 10, 80);
 
     ctx.fillText("Program by Preston Brubaker and Willoh Robbins ", 300, 10);
     ctx.fillText("A red background tile has no food, and the tile has a more purple-shifted hue as it has more food.", 300, 20);
