@@ -5,10 +5,12 @@
 }
 
 #fullscreen {
-    background-color: lightsalmon; 
+    background-color: darkseagreen;
+    font-family: 'fishfont', sans-serif;
     color: white; 
     border: none; 
-    padding: 15px 32px; 
+    padding: 15px 32px;
+    margin-top: 1rem;
     text-align: center;
     text-decoration: none;
     display: block;
@@ -36,7 +38,7 @@ body {
 }
 
 #canvas1 {
-    border: 1rem solid seashell;
+    border: 0.25rem solid seashell;
     display: block;
     cursor: pointer;
     margin-left: auto;
