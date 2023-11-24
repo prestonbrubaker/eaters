@@ -41,7 +41,24 @@ document.addEventListener('fullscreenchange', function() {
     resizeCanvas();
 });
 
-
+// Fullscreen Button Action
+document.getElementById("fullscreen").addEventListener("click", function() {
+    var fullscreenButton = document.getElementById("fullscreen");
+    if (fullscreenButton) {
+        fullscreenButton.addEventListener("click", function() {
+        var canvas = document.getElementById("canvas1");
+        if (canvas.requestFullscreen) {
+            canvas.requestFullscreen();
+        } else if (canvas.mozRequestFullScreen) { /* Firefox */
+            canvas.mozRequestFullScreen();
+        } else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            canvas.webkitRequestFullscreen();
+        } else if (canvas.msRequestFullscreen) { /* IE/Edge */
+            canvas.msRequestFullscreen();
+        }
+        });
+    };
+});
 
 var pA = new Array(pCY);
 
