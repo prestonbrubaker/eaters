@@ -12,10 +12,20 @@ var maxH = c.height;
 var pixS = Math.floor(10);
 var pixS_OG = pixS;
 
+// Creatures
+cr_x = [400, 300, 200, 100];
+cr_y = [400, 200, 304, 100];
+cr_food = [10, 10, 10, 10];
+cr_speed = [1, 10, 20, 30];
+
+cr_size = 10;
+
+cr_hue = [20, 100, 200, 300];
+
 
 const bgHue = "#777777";
-var pCX = Math.floor(maxW / pixS);  // count of pixels across the screen
-var pCY = Math.floor(maxH / pixS);  // count of pixels across the screen
+var pCX = Math.floor(maxW / pixS - 5);  // count of pixels across the screen
+var pCY = Math.floor(maxH / pixS - 1);  // count of pixels across the screen
 var maxW_OG = maxW;
 var maxH_OG = maxH;
 
@@ -34,7 +44,7 @@ function resizeCanvas() {
 function updateWorld() {
     maxW = c.width;
     maxH = c.height;
-    pixS = maxH / maxH_OG * pixS_OG;
+    pixS = maxW / maxW_OG * pixS_OG;
 }
 
 resizeCanvas();
@@ -72,7 +82,7 @@ function initialize(){
     for (var y = 0; y < pCY ; y++){
         temp_x = new Array(pCX);
         for (var x = 0; x < pCX; x++){
-            temp_x[x] = Math.random();
+            temp_x[x] = Math.random() * 3;
         }
         pA[y] = temp_x;
         cloneA[y] = temp_x;
@@ -84,20 +94,87 @@ function tick() {
     ctx.clearRect(minW, minH, maxW, maxH);
     ctx.fillStyle = bgHue;
     ctx.fillRect(minW, minH, maxW, maxH);
-  
+    
+    var total_food = 0
     // Draw screen
     ctx.fillStyle = "#666666";
     for( var y = 0; y < pCY; y++){
         for (var x = 0; x < pCX; x++){
-            ctx.fillStyle = "hsl(" + pA[y][x] * 360 + ", 100%, 50%)"; // Blue color
-            ctx.fillRect(x * pixS, y * pixS, pixS, pixS)
+            ctx.fillStyle = "hsl(" + Math.abs(pA[y][x]) * 360 + ", 10%, 30%)"; // Blue color
+            ctx.fillRect(x * pixS, y * pixS, pixS, pixS);
+            total_food += pA[y][x];
+            pA[y][x] += Math.random() * 0.1;
+            
+        }
+    }
+    var current_len = cr_hue.length;
+    // Draw Fish
+    for( var i = 0; i < current_len; i++){
+        ctx.fillStyle = "hsl(" + cr_hue[i] + ", 50%, 50%)"; // Blue color
+        x = cr_x[i];
+        y = cr_y[i];
+        ctx.fillRect(x, y, cr_size, cr_size);
+        x += (Math.random() - 0.5) * cr_speed[i];
+        y += (Math.random() - 0.5) * cr_speed[i];
+        if(x < 0){
+            x = 0;
+        }
+        if(x > pCX * pixS){
+            x = pCX * pixS;
+        }
+        if(y < 0){
+            y = 0;
+        }
+        if(y > pCY * pixS){
+            y = pCY * pixS;
+        }
+
+        index_x = Math.floor(x / pixS);
+        index_y = Math.floor(y / pixS);
+
+        //Add food
+        if(pA[index_y][index_x] > 0){
+            var food_trans = 0.5 * pA[index_y][index_x];
+            pA[index_y][index_x] -= food_trans;
+            cr_food[i] += food_trans;
+        }
+
+        //Have child if possible
+        if(cr_food[i] > 20){
+            var child_trans = 10;
+            cr_food[i] -= child_trans;
+            cr_x.push(cr_x[i]);
+            cr_y.push(cr_y[i]);
+            cr_food.push(child_trans);
+            cr_hue.push(cr_hue[i]);
+            cr_speed.push(cr_speed[i] * (Math.random() * 0.1 + 0.95))
+        }
+
+
+
+        cr_x[i] = x;
+        cr_y[i] = y;
+
+        // Metabolism
+        cr_food[i] -= .01 * Math.abs(cr_speed[i]) + 0.01;
+        
+
+    }
+
+    // Kill those without food
+    for(var i = current_len - 1; i >= 0; i--){
+        if(cr_food[i] <= 0){
+            cr_x.splice(i, 1);
+            cr_y.splice(i, 1);
+            cr_food.splice(i, 1);
+            cr_hue.splice(i, 1);
+            cr_speed.splice(i, 1);
         }
     }
 
-
     // Write troubleshooting info
     ctx.fillStyle = "#000000";
-    ctx.fillText("X-Value of Player: " + 0, 10, 10);
+    ctx.fillText("Total Food: " + total_food, 10, 10);
 
     itC++;
 }
