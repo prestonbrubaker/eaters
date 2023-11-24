@@ -6,11 +6,15 @@ var pCXW = 1000;      // count of pixels across the world
 var pCYW = 800;       // count of pixels across the world
 var itC = 0;
 const tickS = 50;
-const pixS = 10;
+var pixS = 10;
+var pixS_OG = pixS;
 const minW = 0;
 const minH = 0;
 var maxW = c.width;   
-var maxH = c.height;   
+var maxH = c.height;
+
+var maxW_OG = maxW;
+var maxH_OG = maxH;
 const bgHue = "#777777";
 var pCX = Math.floor(maxW / pixS);  // count of pixels across the screen
 var pCY = Math.floor(maxH / pixS);  // count of pixels across the screen
@@ -30,8 +34,7 @@ function resizeCanvas() {
 function updateWorld() {
     maxW = c.width;
     maxH = c.height;
-    pCX = Math.floor(maxW / pixS);
-    pCY = Math.floor(maxH / pixS);
+    pixS = maxH / maxH_OG * pixS_OG;
 }
 
 resizeCanvas();
